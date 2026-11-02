@@ -17,7 +17,8 @@ internal static class AccordSettings
         {
             if (!Supported(p)) continue;
             var value = p.GetValue(Service.Config);
-            values[p.Name] = value is ConditionBoolean flag ? new JValue(flag.Value) : value == null ? JValue.CreateNull() : JToken.FromObject(value);
+            values[p.Name] = value is ConditionBoolean flag ? new JValue(flag.Value) : value == null ? JValue.CreateNull() :
+                value.GetType().IsEnum ? new JValue(value.ToString()) : JToken.FromObject(value);
         }
         return JsonConvert.SerializeObject(new { Success = true, ApiVersion = 1, Settings = values });
     }
