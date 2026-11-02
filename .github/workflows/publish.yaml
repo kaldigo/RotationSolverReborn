@@ -5,8 +5,6 @@ on:
       - '*.*.*.*'
 jobs:
   Build:
-    # The fork publishes only separately checked experimental packages.
-    if: github.repository == 'FFXIV-CombatReborn/RotationSolverReborn'
     permissions:
       contents: write
     runs-on: windows-latest

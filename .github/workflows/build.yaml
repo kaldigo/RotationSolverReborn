@@ -1,5 +1,7 @@
 name: Build
 on:
+  push:
+    branches: [codex/accord-testing]
   pull_request:
     branches:
       - main
@@ -27,3 +29,5 @@ jobs:
 
       - name: Build Plugin
         run: dotnet build --no-restore -c Release RotationSolver/RotationSolver.csproj
+      - name: Check settings value validation
+        run: dotnet run --project tests/Settings.Tests.csproj -c Release

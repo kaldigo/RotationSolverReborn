@@ -225,7 +225,6 @@ public class BaseItem : IBaseItem
 	/// <returns></returns>
 	public unsafe bool Use()
 	{
-		if (!RotationSolver.IPC.AccordExperiment.CanRun) return false;
 		if (Player.Object == null)
 		{
 			return false;

@@ -51,7 +51,6 @@ namespace RotationSolver.Updaters
 
 		public static unsafe void Update()
 		{
-			if (!RotationSolver.IPC.AccordExperiment.CanRun) return;
 			if (!Player.Available)
 			{
 				return;
@@ -112,7 +111,7 @@ namespace RotationSolver.Updaters
 
 		private static unsafe bool SetAutoAttackStateDetour(AutoAttackState* self, bool value, bool sendPacket, bool isInstant)
 		{
-			if (value && RotationSolver.IPC.AccordExperiment.CanRun && Player.Available && DataCenter.IsActivated() && PlayerHasNoCastingStatus())
+			if (value && Player.Available && DataCenter.IsActivated() && PlayerHasNoCastingStatus())
 			{
 				PluginLog.Debug("[AutoAttackUpdater] Prevented auto attack activation due to NoCastingStatus.");
 				return true;

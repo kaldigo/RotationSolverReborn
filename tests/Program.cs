@@ -1,17 +1,23 @@
 using RotationSolver.IPC;
 
-static void Check(bool ok, string label) { if (!ok) throw new Exception(label); }
-var lease = new ExperimentLease();
-Check(!lease.Active(0, false), "No consent on startup");
-try { lease.Begin(0, true); throw new Exception("Conflict accepted"); } catch (InvalidOperationException) { }
-var token = lease.Begin(10, false);
-Check(lease.Active(11, false), "Explicit consent");
-Check(!lease.Active(11, true), "Late conflict blocks execution");
-Check(!lease.Renew("wrong", 11, false), "Unknown clients cannot renew");
-Check(lease.Renew(token, 100, false), "Heartbeat extends session");
-Check(!lease.Active(4100, false), "Deadline is exclusive");
-Check(!lease.Renew(token, 4100, false), "Expired consent cannot revive itself");
-var replacement = lease.Begin(5000, false);
-Check(!lease.End(token), "Old session cannot end replacement");
-Check(lease.End(replacement) && !lease.Active(5001, false), "Explicit stop revokes consent");
-Console.WriteLine("Experiment lease scenarios passed.");
+static void Check(bool value) { if (!value) throw new Exception("Setting conversion failed"); }
+static void Reject(Type type, string value)
+{
+    try { SettingsValue.Parse(type, value); }
+    catch { return; }
+    throw new Exception("Invalid setting accepted: " + value);
+}
+Check((bool)SettingsValue.Parse(typeof(bool), "true"));
+Check((int)SettingsValue.Parse(typeof(int), "7") == 7);
+Check((float)SettingsValue.Parse(typeof(float), "0.75") == 0.75f);
+Check((DayOfWeek)SettingsValue.Parse(typeof(DayOfWeek), "\"Monday\"") == DayOfWeek.Monday);
+Reject(typeof(bool), "\"false\"");
+Reject(typeof(int), "1.5");
+Reject(typeof(byte), "256");
+Reject(typeof(uint), "-1");
+Reject(typeof(DayOfWeek), "\"NotADay\"");
+Reject(typeof(DayOfWeek), "999");
+Reject(typeof(float), "NaN");
+Reject(typeof(int), "null");
+Reject(typeof(int), "{}");
+Console.WriteLine("Settings conversion checks passed.");

@@ -1,16 +1,11 @@
 ﻿<Project Sdk="Dalamud.NET.Sdk/15.0.0">
 	<PropertyGroup>
-		<AssemblyName>AccordRSREngine</AssemblyName>
-		<Version>0.1.0.0</Version>
 		<Description>Based on the pve combat information in one frame, find the best action.</Description>
 		<TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
 		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<OutputPath>$(SolutionDir)bin\$(Configuration)\</OutputPath>
 	</PropertyGroup>
-	<ItemGroup>
-		<None Remove="RotationSolver.json" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="ECommons" Version="3.2.1.26" />

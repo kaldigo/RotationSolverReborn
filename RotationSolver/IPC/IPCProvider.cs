@@ -12,20 +12,14 @@ namespace RotationSolver.IPC
 			_ = EzIPC.Init(this, prefix: "RotationSolverReborn");
 		}
 
+		[EzIPC] public string AccordReadSettings() => AccordSettings.Read();
+		[EzIPC] public string AccordSetSetting(string name, string valueJson) => AccordSettings.Set(name, valueJson);
+
 		[EzIPC]
 		public void Test(string param)
 		{
 			PluginLog.Debug($"IPC Test! Param:{param}");
 		}
-
-		// JSON keeps the experimental client independent of RSR enum and assembly types.
-		[EzIPC] public string AccordDiscover() => AccordExperiment.Discover();
-		[EzIPC] public string AccordBeginSession() => AccordExperiment.Begin();
-		[EzIPC] public string AccordHeartbeat(string token) => AccordExperiment.Heartbeat(token);
-		[EzIPC] public string AccordEndSession(string token) => AccordExperiment.End(token);
-		[EzIPC] public string AccordRun(string token) => AccordExperiment.Run(token);
-		[EzIPC] public string AccordStop(string token) => AccordExperiment.Stop(token);
-		[EzIPC] public string AccordObserve() => AccordExperiment.Observe();
 
 		[EzIPC]
 		public void AddPriorityNameID(uint nameId)

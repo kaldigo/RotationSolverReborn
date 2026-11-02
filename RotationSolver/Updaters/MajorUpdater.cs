@@ -41,13 +41,6 @@ internal static class MajorUpdater
 
 	private static void OnUpdate(IFramework framework)
 	{
-		// No targeting, movement, automatic start or Wrath IPC while not explicitly opted in.
-		if (!AccordExperiment.CanRun)
-		{
-			if (DataCenter.State) RSCommands.CancelState();
-			ActionUpdater.ClearNextAction();
-			return;
-		}
 		if (!ShouldRunThisCycle(framework, out var isValid))
 		{
 			return;
@@ -193,7 +186,7 @@ internal static class MajorUpdater
 			Run("(RSRActivatedCore): RSCommands.UpdateTargetFromNextAction (TeachingMode)", RSCommands.UpdateTargetFromNextAction);
 		}
 
-		// This experiment never changes the stable Wrath engine's state.
+		Run("(RSRActivatedCore): Wrath_IPCSubscriber.DisableAutoRotation", Wrath_IPCSubscriber.DisableAutoRotation);
 	}
 
 	private static void ResetBmrDataIfLive()

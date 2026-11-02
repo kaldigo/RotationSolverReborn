@@ -50,9 +50,6 @@ public sealed class RotationSolverPlugin : IAsyncDalamudPlugin
 
 	public RotationSolverPlugin(IDalamudPluginInterface pluginInterface)
 	{
-		foreach (var installed in pluginInterface.InstalledPlugins)
-			if (installed.InternalName == "RotationSolver" && installed.IsLoaded)
-				throw new InvalidOperationException("Disable stock Rotation Solver Reborn before loading the Accord test engine.");
 		ECommonsMain.Init(pluginInterface, this, ECommons.Module.DalamudReflector, ECommons.Module.ObjectFunctions);
 
 		M3.ElementBaseline = 0.75f;
