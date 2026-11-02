@@ -261,6 +261,7 @@ public class BaseAction : IBaseAction
 	/// <inheritdoc/>
 	public unsafe bool Use()
 	{
+		if (!RotationSolver.IPC.AccordExperiment.CanRun) return false;
 		if (Player.Object == null)
 		{
 			return false;

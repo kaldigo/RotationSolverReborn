@@ -9,5 +9,6 @@ RotationSolver.sln.DotSettings.user
 /RotationSolver.GameData/RotationSolver.GameData.csproj.user
 /doc
 .vscode/
+artifacts/
 *.csproj.user
 *.csproj.Backup.tmp

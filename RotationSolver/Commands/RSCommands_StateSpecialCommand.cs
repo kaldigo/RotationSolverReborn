@@ -37,6 +37,7 @@ namespace RotationSolver.Commands
 
 		public static void DoStateCommandType(StateCommandType stateType, int index = -1)
 		{
+			if (stateType != StateCommandType.Off && !AccordExperiment.CanRun) return;
 			DoOneCommandType(role =>
 			{
 				if (!DataCenter.State && DataCenter.IsPvP && !DataCenter.IsPvPStateEnabled && Service.Config.PvpStateControl)
@@ -72,6 +73,7 @@ namespace RotationSolver.Commands
 
 		public static void SetStateCommandType(StateCommandType stateType)
 		{
+			if (stateType != StateCommandType.Off && !AccordExperiment.CanRun) return;
 			DoOneCommandType(role =>
 			{
 				if (stateType != StateCommandType.Off)
@@ -349,6 +351,8 @@ namespace RotationSolver.Commands
 
 		private static void ApplyState(StateCommandType stateType, JobRole role, TargetingType? autodutyTargeting, IpcStateOverrides? ipcOverrides)
 		{
+			if (stateType != StateCommandType.Off && !RotationSolver.IPC.AccordExperiment.CanRun)
+				stateType = StateCommandType.Off;
 			if (DataCenter.PvPAutomationBlocked && stateType != StateCommandType.Off)
 			{
 				Svc.Chat.PrintError("Rotation Solver Reborn: Autorotation is blocked in PvP while 'Auto PVP Series Grind' is enabled. It is an AI generated plugin and has been breaking RSR installations.");

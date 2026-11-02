@@ -17,8 +17,8 @@ namespace RotationSolver.Basic;
 
 internal class Service : IDisposable
 {
-	public const string COMMAND = "/rotation";
-	public const string ALTCOMMAND = "/rsr";
+	public const string COMMAND = "/rotationtest";
+	public const string ALTCOMMAND = "/rsrtest";
 	public const string USERNAME = "FFXIV-CombatReborn";
 	public const string REPO = "RotationSolverReborn";
 
