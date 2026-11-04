@@ -1,0 +1,71 @@
+name: Build testing candidate
+on:
+  push:
+    branches: [testing]
+  workflow_dispatch:
+    inputs:
+      testing_version:
+        description: Optional four-part candidate version; empty validates only
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: testing-candidate
+  cancel-in-progress: true
+jobs:
+  testing:
+    if: github.ref == 'refs/heads/testing'
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare Dalamud
+        shell: pwsh
+        run: |
+          Invoke-WebRequest https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile "$env:RUNNER_TEMP/dalamud.zip"
+          Expand-Archive "$env:RUNNER_TEMP/dalamud.zip" -DestinationPath "$env:APPDATA/XIVLauncher/addon/Hooks/dev" -Force
+      - name: Build and validate
+        shell: pwsh
+        env:
+          TESTING_VERSION: ${{ inputs.testing_version }}
+        run: |
+          $buildArgs=@('build','RotationSolver/RotationSolver.csproj','-c','Release')
+          if ($env:TESTING_VERSION) {
+            if ($env:TESTING_VERSION -notmatch '^\d+\.\d+\.\d+\.\d+$') { throw 'Expected a four-part version' }
+            $buildArgs+="-p:Version=$env:TESTING_VERSION"
+          }
+          dotnet @buildArgs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          if ($env:TESTING_VERSION -and [Reflection.AssemblyName]::GetAssemblyName((Resolve-Path 'RotationSolver/bin/Release/RotationSolver.dll')).Version -ne [version]$env:TESTING_VERSION) { throw 'Actual DLL version differs' }
+          dotnet run --project tests/Settings.Tests.csproj -c Release
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -m unittest discover -s tests -p 'test_*.py'
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Package opt-in candidate
+        if: inputs.testing_version != ''
+        shell: pwsh
+        env:
+          TESTING_VERSION: ${{ inputs.testing_version }}
+        run: |
+          $stable=Join-Path $env:RUNNER_TEMP 'stable-feed.json'
+          Invoke-WebRequest https://raw.githubusercontent.com/FFXIV-CombatReborn/CombatRebornRepo/main/pluginmaster.json -OutFile $stable
+          python tools/package_testing.py --tag "testing-v$env:TESTING_VERSION" --stable-feed $stable
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tools/check_testing_package.py --tag "testing-v$env:TESTING_VERSION" --stable-feed $stable
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          git rev-parse HEAD | Set-Content artifacts/testing/SOURCE_COMMIT.txt
+      - uses: actions/upload-artifact@v4
+        if: inputs.testing_version != ''
+        with:
+          name: testing-candidate-${{ github.sha }}
+          path: artifacts/testing/
+          if-no-files-found: error

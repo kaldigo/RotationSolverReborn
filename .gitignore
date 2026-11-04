@@ -12,3 +12,5 @@ RotationSolver.sln.DotSettings.user
 *.csproj.user
 *.csproj.Backup.tmp
 artifacts/
+artifacts/
+__pycache__/

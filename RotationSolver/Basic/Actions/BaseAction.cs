@@ -201,6 +201,8 @@ public class BaseAction : IBaseAction
 		act = this;
 
 		ActionTracer.Try(this);
+		if (!RotationSolver.IPC.AccordActionPermissions.Allowed(ID, AdjustedID))
+			return ActionTracer.Reject(this, "AccordManualOnly");
 
 		if (IBaseAction.ActionPreview)
 		{
@@ -262,6 +264,7 @@ public class BaseAction : IBaseAction
 	public unsafe bool Use()
 	{
 		if (!RotationSolver.IPC.AutomationOwnership.Allowed) return false;
+		if (!RotationSolver.IPC.AccordActionPermissions.Allowed(ID, AdjustedID)) return false;
 		using var independentAction = RotationSolver.IPC.AutomationOwnership.IsolateWrathHooks();
 		if (Player.Object == null)
 		{

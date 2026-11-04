@@ -1,0 +1,14 @@
+{
+  "internal_name": "RotationSolver",
+  "repository": "kaldigo/RotationSolverReborn",
+  "minimum_version": "7.5.7.5",
+  "project": "RotationSolver/RotationSolver.csproj",
+  "build": "RotationSolver/bin/Release",
+  "required_dlls": ["RotationSolver.dll", "ECommons.dll", "RebornMaterial.dll"],
+  "licenses": {
+    "COPYING": "COPYING",
+    "COPYING.LESSER": "COPYING.LESSER",
+    "licenses/ECommons.md": "licenses/ECommons.md",
+    "licenses/dependencies.md": "licenses/dependencies.md"
+  }
+}

@@ -5,6 +5,7 @@ on:
       - '*.*.*.*'
 jobs:
   Build:
+    if: "!startsWith(github.ref_name, 'testing-')"
     permissions:
       contents: write
     runs-on: windows-latest

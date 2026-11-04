@@ -13,6 +13,7 @@ namespace RotationSolver.IPC
 		}
 
 		[EzIPC] public string AccordReadSettings() => AccordSettings.Read();
+		[EzIPC] public string AccordActionPermissions(string request) => IPC.AccordActionPermissions.Handle(request);
 		[EzIPC] public string AccordAutomationOwnership(string request) => AutomationOwnership.Handle(request);
 		[EzIPC] public string AccordSetSetting(string name, string valueJson) => AccordSettings.Set(name, valueJson);
 
