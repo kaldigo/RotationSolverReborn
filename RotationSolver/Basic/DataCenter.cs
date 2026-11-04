@@ -350,6 +350,11 @@ internal static class DataCenter
 	public static AutoStatus CommandStatus { get; set; } = AutoStatus.None;
 
 	private static readonly List<NextAct> NextActs = [];
+	internal static void ClearAccordPendingActions()
+	{
+		NextActs.Clear();
+		CurrentInterceptedAction = null;
+	}
 
 	public static IAction? CommandNextAction
 	{
@@ -534,7 +539,12 @@ internal static class DataCenter
 		OnSpecialTypeChanged?.Invoke(value);
 	}
 
-	public static bool State { get; set; } = false;
+	private static bool requestedState;
+	public static bool State
+	{
+		get => requestedState && RotationSolver.IPC.AutomationOwnership.Allowed;
+		set => requestedState = value && RotationSolver.IPC.AutomationOwnership.Allowed;
+	}
 
 	public static bool IsManual { get; set; } = false;
 

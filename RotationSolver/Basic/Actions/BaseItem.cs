@@ -225,6 +225,8 @@ public class BaseItem : IBaseItem
 	/// <returns></returns>
 	public unsafe bool Use()
 	{
+		if (!RotationSolver.IPC.AutomationOwnership.Allowed) return false;
+		using var independentAction = RotationSolver.IPC.AutomationOwnership.IsolateWrathHooks();
 		if (Player.Object == null)
 		{
 			return false;

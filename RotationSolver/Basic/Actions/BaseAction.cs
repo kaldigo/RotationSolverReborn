@@ -261,6 +261,8 @@ public class BaseAction : IBaseAction
 	/// <inheritdoc/>
 	public unsafe bool Use()
 	{
+		if (!RotationSolver.IPC.AutomationOwnership.Allowed) return false;
+		using var independentAction = RotationSolver.IPC.AutomationOwnership.IsolateWrathHooks();
 		if (Player.Object == null)
 		{
 			return false;

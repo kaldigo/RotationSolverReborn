@@ -132,6 +132,8 @@ internal class Service : IDisposable
 	/// <returns>The adjusted action ID.</returns>
 	public static unsafe uint GetAdjustedActionId(uint id)
 	{
+		if (RotationSolver.IPC.AutomationOwnership.Managed)
+			return Svc.PluginInterface.GetIpcSubscriber<uint, uint>("WrathCombo.AutomationNativeAction.v1").InvokeFunc(id);
 		return ActionManager.Instance()->GetAdjustedActionId(id);
 	}
 

@@ -64,6 +64,7 @@ namespace RotationSolver.Commands
 
 		public static void DoAction()
 		{
+			if (!RotationSolver.IPC.AutomationOwnership.Allowed) return;
 			if (Player.Object != null && Player.Object.StatusList == null)
 			{
 				return;

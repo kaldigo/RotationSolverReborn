@@ -10,6 +10,7 @@ namespace RotationSolver.Basic.Configuration;
 
 internal partial class Configs : IPluginConfiguration, IM3Settings
 {
+	public bool AccordAutomationManaged;
 	[JsonIgnore]
 	public const string
 		BasicTimer = "BasicTimer",
