@@ -132,8 +132,12 @@ public sealed unsafe class ActionManagerEx : IDisposable
 	private void ReceiveActionEffectDetour(uint casterEntityId, Character* casterPtr, Vector3* targetPos, ActionEffectHandler.Header* header, ActionEffectHandler.TargetEffects* effects, GameObjectId* targetEntityIds)
 	{
 		var actionManager = ActionManager.Instance();
-        AccordDiagnostics.DiagnosticLog.Event("Server.NativeEffect", () => new { Actor = casterEntityId, Action = header->ActionId, Sequence = header->GlobalSequence, SourceSequence = header->SourceSequence,
-            Targets = Enumerable.Range(0, header->NumTargets).Select(i => targetEntityIds[i].Id).ToArray(), AnimationLock = header->AnimationLock });
+        AccordDiagnostics.DiagnosticLog.Event("Server.NativeEffect", () => {
+            var recipients = new ulong[header->NumTargets];
+            for (int i = 0; i < recipients.Length; i++) recipients[i] = targetEntityIds[i].Id;
+            return new { Actor = casterEntityId, Action = header->ActionId, Sequence = header->GlobalSequence, SourceSequence = header->SourceSequence,
+                Targets = recipients, AnimationLock = header->AnimationLock };
+        });
 		var packetAnimLock = header->AnimationLock;
 		var prevAnimLock = actionManager == null ? 0 : actionManager->AnimationLock;
 
