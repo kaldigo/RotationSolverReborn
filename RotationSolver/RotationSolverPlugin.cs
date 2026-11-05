@@ -386,6 +386,7 @@ public sealed class RotationSolverPlugin : IAsyncDalamudPlugin
 
 	public async ValueTask DisposeAsync()
 	{
+        RotationSolver.IPC.DiagnosticCapture.Stop();
 		MajorUpdater.Dispose();
 
 		ActionTracer.Shutdown();

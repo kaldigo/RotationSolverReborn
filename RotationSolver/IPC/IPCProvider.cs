@@ -9,6 +9,7 @@ namespace RotationSolver.IPC
 	{
 		internal IPCProvider()
 		{
+            DiagnosticCapture.Start();
 			_ = EzIPC.Init(this, prefix: "RotationSolverReborn");
 		}
 

@@ -64,28 +64,28 @@ namespace RotationSolver.Commands
 
 		public static void DoAction()
 		{
-			if (!RotationSolver.IPC.AutomationOwnership.Allowed) return;
+			if (!RotationSolver.IPC.AutomationOwnership.Allowed) { AccordDiagnostics.DiagnosticLog.Exit("Ownership denied"); return; }
 			if (Player.Object != null && Player.Object.StatusList == null)
 			{
-				return;
+				{ AccordDiagnostics.DiagnosticLog.Exit("Player status unavailable"); return; }
 			}
 
 			var nextAction = ActionUpdater.NextAction;
 			if (nextAction == null)
 			{
-				return;
+				{ AccordDiagnostics.DiagnosticLog.Exit("No selected action"); return; }
 			}
 
 			if (DataCenter.AnimationLock > 0f)
 			{
-				return;
+				{ AccordDiagnostics.DiagnosticLog.Exit("Animation lock"); return; }
 			}
 
 			if (nextAction is BaseAction baseAct)
 			{
 				if (baseAct.Info.IsAbility && !baseAct.Setting.IsMudra && DataCenter.DefaultGCDRemain <= 0.5f && DataCenter.DefaultGCDRemain > 0f)
 				{
-					return;
+					{ AccordDiagnostics.DiagnosticLog.Exit("Insufficient weave window"); return; }
 				}
 			}
 
@@ -96,30 +96,30 @@ namespace RotationSolver.Commands
 				var remainingCastTime = player.TotalCastTime - player.CurrentCastTime;
 				if (minStatusTime > remainingCastTime && minStatusTime < NoCastingStatusHelper.ResolveWindow)
 				{
-					return;
+					{ AccordDiagnostics.DiagnosticLog.Exit("No-casting status window"); return; }
 				}
 			}
 
 			if (DataCenter.BMRSpecialModeType == SpecialMode.Pyretic)
 			{
 				PluginLog.Verbose("Player has Pyretic special mode active, skipping action use to avoid potential issues.");
-				return;
+				{ AccordDiagnostics.DiagnosticLog.Exit("BossMod Pyretic"); return; }
 			}
 
 			if (StatusHelper.PlayerHasStatus(false, StatusID.MotionTracker))
 			{
 				PluginLog.Verbose("Player has Motion Tracker status, skipping action use to avoid potential issues.");
-				return;
+				{ AccordDiagnostics.DiagnosticLog.Exit("Motion Tracker"); return; }
 			}
 
 			if (StatusHelper.PlayerHasStatus(false, StatusID.Transcendent))
 			{
-				return;
+				{ AccordDiagnostics.DiagnosticLog.Exit("Raise invincibility"); return; }
 			}
 
 			if (StatusHelper.PlayerHasStatus(false, StatusID.WaningNocturne))
 			{
-				return;
+				{ AccordDiagnostics.DiagnosticLog.Exit("Waning Nocturne"); return; }
 			}
 
 #if DEBUG

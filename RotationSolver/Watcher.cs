@@ -177,6 +177,7 @@ public static class Watcher
 
 	private static void ActionFromSelf(ActionEffectSet set)
 	{
+        AccordDiagnostics.DiagnosticLog.Event("Server.Effect", () => new { Source = set.Source?.GameObjectId, Action = set.Action?.RowId, Target = set.Target?.GameObjectId, Targets = set.TargetEffects.Length });
 		try
 		{
 			var playerObject = Player.Object;

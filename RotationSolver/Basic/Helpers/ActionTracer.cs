@@ -127,6 +127,7 @@ internal static class ActionTracer
 
 	internal static void BeginFrame()
 	{
+        AccordDiagnostics.DiagnosticLog.Event("Resolver.Begin", () => null);
 		if (!Enabled)
 		{
 			return;
@@ -139,6 +140,7 @@ internal static class ActionTracer
 
 	internal static void EndFrame(IAction? chosen)
 	{
+        AccordDiagnostics.DiagnosticLog.Event("Resolver.Chosen", () => new { Action = chosen?.ID });
 		if (!Enabled)
 		{
 			return;
@@ -150,6 +152,7 @@ internal static class ActionTracer
 
 	internal static void Try(IBaseAction a)
 	{
+        AccordDiagnostics.DiagnosticLog.Event("Resolver.Try", () => new { Action = a.ID });
 		if (!Enabled)
 		{
 			return;
@@ -160,6 +163,7 @@ internal static class ActionTracer
 
 	internal static bool Reject(IBaseAction a, string reason)
 	{
+        AccordDiagnostics.DiagnosticLog.Event("Resolver.Rejected", () => new { Action = a.ID, Reason = reason });
 		if (!Enabled)
 		{
 			return false;
@@ -171,6 +175,7 @@ internal static class ActionTracer
 
 	internal static void Accept(IBaseAction a)
 	{
+        AccordDiagnostics.DiagnosticLog.Event("Resolver.Accepted", () => new { Action = a.ID });
 		if (!Enabled)
 		{
 			return;

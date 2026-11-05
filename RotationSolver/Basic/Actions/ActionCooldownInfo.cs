@@ -216,14 +216,14 @@ public readonly struct ActionCooldownInfo : ICooldown
 				{
 					if (!WillHaveOneChargeGCD(0, 0))
 					{
-						return false;
+						return AccordDiagnostics.DiagnosticLog.Predicate(false);
 					}
 				}
 				else
 				{
 					if (!HasOneCharge && RecastTimeRemainOneChargeRaw > DataCenter.DefaultGCDRemain)
 					{
-						return false;
+						return AccordDiagnostics.DiagnosticLog.Predicate(false);
 					}
 				}
 			}
@@ -232,7 +232,7 @@ public readonly struct ActionCooldownInfo : ICooldown
 			{
 				if (RecastTimeRemain > DataCenter.DefaultGCDRemain + (DataCenter.DefaultGCDTotal * gcdCountForAbility))
 				{
-					return false;
+					return AccordDiagnostics.DiagnosticLog.Predicate(false);
 				}
 			}
 		}
@@ -241,7 +241,7 @@ public readonly struct ActionCooldownInfo : ICooldown
 		{
 			if (Player.AnimationLock > 0f || !HasOneCharge)
 			{
-				return false;
+				return AccordDiagnostics.DiagnosticLog.Predicate(false);
 			}
 		}
 		return true;

@@ -150,12 +150,12 @@ public readonly struct ActionBasicInfo
 
 		if (UnlockLink != 0 && !UIState.Instance()->IsUnlockLinkUnlockedOrQuestCompleted(UnlockLink))
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (_action.Setting.UnlockedByQuestID != 0 && !UIState.Instance()->IsUnlockLinkUnlockedOrQuestCompleted(_action.Setting.UnlockedByQuestID))
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		return true;
@@ -176,7 +176,7 @@ public readonly struct ActionBasicInfo
 			return true;
 		}
 
-		return false;
+		return AccordDiagnostics.DiagnosticLog.Predicate(false);
 	}
 
 	/// <summary>
@@ -297,7 +297,7 @@ public readonly struct ActionBasicInfo
 						return true;
 					}
 				}
-				return false;
+				return AccordDiagnostics.DiagnosticLog.Predicate(false);
 			}
 
 			if (_action.Action.ClassJob.RowId == (uint)Job.BLU)
@@ -309,7 +309,7 @@ public readonly struct ActionBasicInfo
 						return true;
 					}
 				}
-				return false;
+				return AccordDiagnostics.DiagnosticLog.Predicate(false);
 			}
 
 			if (_action.Setting.IsQuestBattleAction)
@@ -326,7 +326,7 @@ public readonly struct ActionBasicInfo
 						return true;
 					}
 				}
-				return false;
+				return AccordDiagnostics.DiagnosticLog.Predicate(false);
 			}
 
 			return IsPvP == DataCenter.IsPvP;
@@ -408,12 +408,12 @@ public readonly struct ActionBasicInfo
 	{
 		if (Player.Object == null)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (Player.Object.StatusList == null)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (DataCenter.Orbonne && (_action.ID == 14415 || _action.ID == 14414) && IsActionCheckValid() && ActionManagerStatusValid())
@@ -423,7 +423,7 @@ public readonly struct ActionBasicInfo
 
 		if (!EnoughLevel)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		var type = ActionHelper.GetActionCate(_action.Action);
@@ -433,7 +433,7 @@ public readonly struct ActionBasicInfo
 			{
 				if (StatusHelper.PlayerHasStatus(false, StatusID.Pacification_620))
 				{
-					return false;
+					return AccordDiagnostics.DiagnosticLog.Predicate(false);
 				}
 			}
 
@@ -441,61 +441,61 @@ public readonly struct ActionBasicInfo
 			{
 				if (StatusHelper.PlayerHasStatus(false, StatusID.Silence))
 				{
-					return false;
+					return AccordDiagnostics.DiagnosticLog.Predicate(false);
 				}
 			}
 		}
 
 		if (IsLimitBreak)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (!IsActionEnabled())
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (!IsOnSlot)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (!HasEnoughMP())
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (!IsQuestUnlocked())
 		{
 			BasicWarningHelper.AddSystemWarning($"Do your class quests, action not unlocked: {Name}");
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (!_action.Setting.IgnoresBadStatus && (IsRealGCD || IsAbility)
 			&& Array.IndexOf(ConfigurationHelper.BadStatusAction, (ActionStatus)ActionManager.Instance()->GetActionStatus(ActionType.Action, AdjustedID)) >= 0)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (IsStatusNeeded(skipStatusNeed) || IsStatusProvided(skipStatusProvideCheck))
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (_action.Info.BreaksCombo && !IsComboValid(skipComboCheck))
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (!IsActionJobValid())
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (checkActionManager && !ActionManagerStatusValid())
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		return !NeedsCasting(skipCastingCheck) && (!IsGeneralGCD || !IsStatusProvidedDuringGCD()) && IsActionCheckValid() && IsRotationCheckValid();
@@ -505,22 +505,22 @@ public readonly struct ActionBasicInfo
 	{
 		if (Player.Object == null)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (CastTime <= 0f)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (!Player.Object.WillStatusEnd(0, true, StatusHelper.SwiftcastStatus))
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (Array.IndexOf(ActionsNoNeedCasting, ID) >= 0)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (DataCenter.SpecialType == SpecialCommandType.NoCasting ||
@@ -530,7 +530,7 @@ public readonly struct ActionBasicInfo
 			return true;
 		}
 
-		return false;
+		return AccordDiagnostics.DiagnosticLog.Predicate(false);
 	}
 
 	private bool IsActionEnabled()
@@ -545,7 +545,7 @@ public readonly struct ActionBasicInfo
 	{
 		if (Player.Object == null)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		if (DataCenter.CurrentMp >= MPNeed)
@@ -566,14 +566,14 @@ public readonly struct ActionBasicInfo
 			}
 		}
 
-		return false;
+		return AccordDiagnostics.DiagnosticLog.Predicate(false);
 	}
 
 	private bool IsStatusNeeded(bool skipStatusNeed)
 	{
 		if (Player.Object == null)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		return Player.Object.StatusList != null && !skipStatusNeed && _action.Setting.StatusNeed != null && Player.Object.WillStatusEndGCD(0, 0, _action.Setting.StatusFromSelf, _action.Setting.StatusNeed);
@@ -583,7 +583,7 @@ public readonly struct ActionBasicInfo
 	{
 		if (Player.Object == null)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Predicate(false);
 		}
 
 		return Player.Object.StatusList != null && !skipStatusProvideCheck && _action.Setting.StatusProvide != null && _action.Config.ShouldCheckStatus && !Player.Object.WillStatusEndGCD(_action.Config.StatusRefreshGcdCount, 0, _action.Setting.StatusFromSelf, _action.Setting.StatusProvide);
@@ -601,7 +601,7 @@ public readonly struct ActionBasicInfo
 			return true;
 		}
 
-		return false;
+		return AccordDiagnostics.DiagnosticLog.Predicate(false);
 	}
 
 	private bool IsRotationCheckValid()
@@ -632,7 +632,7 @@ public readonly struct ActionBasicInfo
 			{
 				if (comboIdNot == DataCenter.LastComboAction)
 				{
-					return false;
+					return AccordDiagnostics.DiagnosticLog.Predicate(false);
 				}
 			}
 		}
@@ -667,12 +667,12 @@ public readonly struct ActionBasicInfo
 			{
 				if (DataCenter.ComboTime < DataCenter.DefaultGCDRemain)
 				{
-					return false;
+					return AccordDiagnostics.DiagnosticLog.Predicate(false);
 				}
 			}
 			else
 			{
-				return false;
+				return AccordDiagnostics.DiagnosticLog.Predicate(false);
 			}
 		}
 		return true;

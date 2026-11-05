@@ -198,6 +198,7 @@ public class BaseAction : IBaseAction
 	public bool CanUse(out IAction act, bool skipStatusProvideCheck = false, bool skipStatusNeed = false, bool skipTargetStatusNeedCheck = false, bool skipComboCheck = false, bool skipCastingCheck = false,
 	bool usedUp = false, bool skipAoeCheck = false, bool skipTTKCheck = false, byte gcdCountForAbility = 0, bool checkActionManagerDirectly = false, TargetType targetOverride = default)
 	{
+        using var diagnosticScope = AccordDiagnostics.DiagnosticLog.Begin("Resolver.Candidate", () => new { Action = ID, skipStatusProvideCheck, skipStatusNeed, skipTargetStatusNeedCheck, skipComboCheck, skipCastingCheck, usedUp, skipAoeCheck, skipTTKCheck, gcdCountForAbility, checkActionManagerDirectly, TargetOverride = targetOverride.ToString() });
 		act = this;
 
 		ActionTracer.Try(this);
@@ -250,6 +251,7 @@ public class BaseAction : IBaseAction
 		}
 
 		Target = PreviewTarget.Value;
+        AccordDiagnostics.DiagnosticLog.Event("Resolver.Target", () => new { Action = ID, Target = Target.Target?.GameObjectId, Position = Target.Position });
 
 		ActionTracer.Accept(this);
 		return true;
@@ -263,18 +265,19 @@ public class BaseAction : IBaseAction
 	/// <inheritdoc/>
 	public unsafe bool Use()
 	{
-		if (!RotationSolver.IPC.AutomationOwnership.Allowed) return false;
-		if (!RotationSolver.IPC.AccordActionPermissions.Allowed(ID, AdjustedID)) return false;
+        using var diagnosticScope = AccordDiagnostics.DiagnosticLog.Begin("Native.Request", () => new { Action = ID, Target = Target.Target?.GameObjectId, Position = Target.Position });
+		if (!RotationSolver.IPC.AutomationOwnership.Allowed) return AccordDiagnostics.DiagnosticLog.Reject("RSR execution gate");
+		if (!RotationSolver.IPC.AccordActionPermissions.Allowed(ID, AdjustedID)) return AccordDiagnostics.DiagnosticLog.Reject("RSR execution gate");
 		using var independentAction = RotationSolver.IPC.AutomationOwnership.IsolateWrathHooks();
 		if (Player.Object == null)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Reject("RSR execution gate");
 		}
 
 		var actionManager = ActionManager.Instance();
 		if (actionManager == null)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Reject("RSR execution gate");
 		}
 
 		var target = Target;
@@ -283,20 +286,24 @@ public class BaseAction : IBaseAction
 		{
 			if (adjustId != ID || !target.Position.HasValue)
 			{
-				return false;
+				return AccordDiagnostics.DiagnosticLog.Reject("RSR execution gate");
 			}
 
 			var loc = target.Position.Value;
-			return actionManager->UseActionLocation(ActionType.Action, ID, Player.Object.GameObjectId, &loc);
+			bool accepted = actionManager->UseActionLocation(ActionType.Action, ID, Player.Object.GameObjectId, &loc);
+            AccordDiagnostics.DiagnosticLog.Event("Native.Result", () => new { Action = ID, Accepted = accepted, Position = target.Position });
+            return accepted;
 		}
 
 		var targetId = target.Target?.GameObjectId ?? Player.Object.GameObjectId;
 		if (targetId == 0 || Svc.Objects.SearchById(targetId) == null)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Reject("RSR execution gate");
 		}
 
-		return actionManager->UseAction(ActionType.Action, adjustId, targetId);
+		bool result = actionManager->UseAction(ActionType.Action, adjustId, targetId);
+        AccordDiagnostics.DiagnosticLog.Event("Native.Result", () => new { Action = adjustId, Target = targetId, Accepted = result, ActionQueued = actionManager->ActionQueued, QueueAction = actionManager->QueuedActionId, QueueTarget = actionManager->QueuedTargetId.Id });
+        return result;
 	}
 
 	/// <inheritdoc/>

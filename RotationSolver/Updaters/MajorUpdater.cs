@@ -41,16 +41,19 @@ internal static class MajorUpdater
 
 	private static void OnUpdate(IFramework framework)
 	{
+        using var diagnosticScope = AccordDiagnostics.DiagnosticLog.Begin("Runner.Tick", () => new { AutomationOwnership.Allowed, DataCenter.State, Service.Config.TeachingMode });
 		// Includes auto-enable, targeting, movement, macros and cast cancellation paths.
         if (!AutomationOwnership.Allowed)
         {
+            AccordDiagnostics.DiagnosticLog.Exit("Automation ownership denied");
             AutomationOwnership.StopExecution();
             return;
         }
 		using var independentActions = AutomationOwnership.TryIsolateWrathHooks();
-		if (independentActions == null) return;
+        if (independentActions == null) { AccordDiagnostics.DiagnosticLog.Exit("Wrath isolation unavailable"); return; }
 		if (!ShouldRunThisCycle(framework, out var isValid))
 		{
+            AccordDiagnostics.DiagnosticLog.Exit("Update gate/throttle");
 			return;
 		}
 
@@ -61,6 +64,7 @@ internal static class MajorUpdater
 
 		if (!isValid)
 		{
+            AccordDiagnostics.DiagnosticLog.Exit("Player unavailable, zoning or logging out");
 			Run("RSRInvalidUpdate", InvalidUpdate);
 			return;
 		}
@@ -367,6 +371,7 @@ internal static class MajorUpdater
 
 	private static void LogOnce(string context, Exception ex)
 	{
+        AccordDiagnostics.DiagnosticLog.Event("Error.Runner", () => new { Context = context, Error = ex.ToString() });
 		var key = $"{context}|{ex.GetType().FullName}|{ex.Message}";
 		if (_loggedErrors.Count >= MaxLoggedErrors)
 		{

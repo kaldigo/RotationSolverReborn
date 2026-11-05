@@ -25,6 +25,7 @@ internal static class AccordSettings
 
     internal static string Set(string name, string valueJson)
     {
+        AccordDiagnostics.DiagnosticLog.Event("Settings.ApplyRequest", () => new { Name = name, Value = valueJson });
         try
         {
             var p = typeof(Configs).GetProperty(name);

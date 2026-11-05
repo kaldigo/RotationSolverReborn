@@ -256,39 +256,39 @@ internal static class ActionUpdater
 	{
 		if (DataCenter.IsTargetOnly)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Reject("Target-only mode");
 		}
 
 		var player = Player.Object;
 		if (player == null || player.CurrentHp == 0)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Reject("Player missing or dead");
 		}
 
 		var isPvPPurifyNeeded = DataCenter.IsPvP && StatusHelper.PlayerHasStatus(false, StatusHelper.PurifyPvPStatuses);
 		if (!isPvPPurifyNeeded && IsPlayerOccupied())
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Reject("Player occupied");
 		}
 
 		if (PlayerHasLockActions())
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Reject("Lock-actions status");
 		}
 
 		if (NextAction == null)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Reject("No next action selected");
 		}
 
 		if (player.TotalCastTime - DataCenter.CalculatedActionAhead > 0)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Reject("Cast still in progress");
 		}
 
 		if (DataCenter.AnimationLock > 0f)
 		{
-			return false;
+			return AccordDiagnostics.DiagnosticLog.Reject("Animation lock");
 		}
 
 		return RSCommands.CanDoAnAction(ActionHelper.CanUseGCD);
@@ -359,6 +359,7 @@ internal static class ActionUpdater
 
 	private static void LogError(string message, Exception ex)
 	{
+        AccordDiagnostics.DiagnosticLog.Event("Error.Resolver", () => new { Message = message, Error = ex.ToString() });
 		BasicWarningHelper.AddSystemWarning($"{message} because: {ex.Message}");
 		PluginLog.Error($"{message} because: {ex.Message}");
 	}

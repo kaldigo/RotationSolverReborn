@@ -25,6 +25,7 @@ class OwnershipCleanupTests(unittest.TestCase):
         hook = hook.replace('private static unsafe', 'public static unsafe', 1)
         harness = r'''
 using System;
+namespace AccordDiagnostics { static class DiagnosticLog { public static void Event(string kind, Func<object?> data) {} public static bool Reject(string reason) => false; } }
 static class DataCenter {
     public static bool State, IsManual, IsTargetOnly, IsAutoDuty, IsHenched, IsPvPStateEnabled;
     public static int Role, Pending, Cleared;
