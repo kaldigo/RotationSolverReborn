@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.Gui.Dtr;
+using Dalamud.Game.Gui.Dtr;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using ECommons.DalamudServices;
@@ -21,71 +21,12 @@ internal static class MiscUpdater
 	}
 
 	private static IDtrBarEntry? _dtrEntry;
-	private static string? _dtrText;
-	private static BitmapFontIcon _dtrIcon;
-	private static DTRType? _dtrClickType;
 
 	internal static void UpdateEntry()
-	{
-		if (!Service.Config.ShowInfoOnDtr)
-		{
-			HideEntry();
-			return;
-		}
-
-		var showStr = RSCommands.EntryString;
-		if (string.IsNullOrEmpty(showStr))
-		{
-			HideEntry();
-			return;
-		}
-
-		try
-		{
-			_dtrEntry ??= Svc.DtrBar.Get("Rotation Solver Reborn");
-		}
-		catch
-		{
-			BasicWarningHelper.AddSystemWarning("Unable to add server bar entry");
-			return;
-		}
-
-		if (_dtrEntry == null)
-		{
-			return;
-		}
-
-		if (!_dtrEntry.Shown)
-		{
-			_dtrEntry.Shown = true;
-		}
-
-		var icon = GetJobIcon(Player.Job);
-		if (showStr != _dtrText || icon != _dtrIcon)
-		{
-			_dtrEntry.Text = new SeString(
-				new IconPayload(icon),
-				new TextPayload(showStr)
-			);
-			_dtrText = showStr;
-			_dtrIcon = icon;
-		}
-
-		var dtrType = Service.Config.DTRType;
-		if (dtrType != _dtrClickType)
-		{
-			_dtrEntry.OnClick = dtrType switch
-			{
-				DTRType.DTRNormal => _ => RSCommands.CycleStateWithOneTargetTypes(),
-				DTRType.DTRAllAuto => _ => RSCommands.CycleStateWithAllTargetTypes(),
-				DTRType.DTRAuto => _ => RSCommands.CycleStateAuto(),
-				DTRType.DTRManual => _ => RSCommands.CycleStateManual(),
-				DTRType.DTRManualAuto => _ => RSCommands.CycleStateManualAuto(),
-				_ => _dtrEntry.OnClick,
-			};
-			_dtrClickType = dtrType;
-		}
-	}
+    {
+        // Accord owns the server-bar automation control, including on old configs.
+        HideEntry();
+    }
 
 	private static void HideEntry()
 	{
@@ -219,7 +160,5 @@ internal static class MiscUpdater
 
 		_dtrEntry.Remove();
 		_dtrEntry = null;
-		_dtrText = null;
-		_dtrClickType = null;
 	}
 }

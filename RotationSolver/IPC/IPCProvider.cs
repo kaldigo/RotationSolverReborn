@@ -13,6 +13,9 @@ namespace RotationSolver.IPC
 			_ = EzIPC.Init(this, prefix: "RotationSolverReborn");
 		}
 
+        [EzIPC] public void WrathComboCallback(int reason, string info) =>
+            Wrath_IPCSubscriber.LeaseCancelled((Wrath_IPCSubscriber.CancellationReason)reason, info);
+
 		[EzIPC] public string AccordReadSettings() => AccordSettings.Read();
 		[EzIPC] public string AccordActionPermissions(string request) => IPC.AccordActionPermissions.Handle(request);
 		[EzIPC] public string AccordAutomationOwnership(string request) => AutomationOwnership.Handle(request);

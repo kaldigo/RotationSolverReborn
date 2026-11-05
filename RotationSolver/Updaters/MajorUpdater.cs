@@ -95,11 +95,11 @@ internal static class MajorUpdater
 
 			_timeSinceUpdate = TimeSpan.Zero;
 			isValid = IsValid;
-			RotationSolverPlugin.ShowFirstStartTutorialIfNeeded();
+			// Accord handles onboarding; tutorial remains manually accessible.
 
 			if (isValid)
 			{
-				RotationSolverPlugin.ShowChangelogIfUpdated();
+
 
 				if (!_rotationsLoaded)
 				{
@@ -198,7 +198,8 @@ internal static class MajorUpdater
 			Run("(RSRActivatedCore): RSCommands.UpdateTargetFromNextAction (TeachingMode)", RSCommands.UpdateTargetFromNextAction);
 		}
 
-		Run("(RSRActivatedCore): Wrath_IPCSubscriber.DisableAutoRotation", Wrath_IPCSubscriber.DisableAutoRotation);
+		if (!AutomationOwnership.Managed)
+            Run("(RSRActivatedCore): Wrath_IPCSubscriber.DisableAutoRotation", Wrath_IPCSubscriber.DisableAutoRotation);
 	}
 
 	private static void ResetBmrDataIfLive()

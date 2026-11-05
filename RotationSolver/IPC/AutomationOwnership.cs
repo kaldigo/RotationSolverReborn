@@ -15,8 +15,9 @@ internal static class AutomationOwnership
     internal static IDisposable? TryIsolateWrathHooks()
     {
         try { return IsolateWrathHooks(); }
-        catch
+        catch (Exception ex)
         {
+            AccordDiagnostics.DiagnosticLog.Event("Error.WrathIsolation", () => new { Error = ex.ToString(), Managed, Allowed, Controller = controller });
             Lease.Stop();
             StopExecution();
             return null;
@@ -99,6 +100,7 @@ internal static class AutomationOwnership
                 if (!success) Lease.Stop();
             }
             return new JObject { ["Success"] = success, ["Version"] = 1, ["Managed"] = Managed,
+                ["Running"] = DataCenter.State && !Service.Config.TeachingMode,
                 ["Allowed"] = Allowed, ["Owned"] = Lease.OwnedBy(token, now), ["Busy"] = Busy,
                 ["Build"] = typeof(AutomationOwnership).Assembly.ManifestModule.ModuleVersionId.ToString() }.ToString();
         }

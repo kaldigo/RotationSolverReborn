@@ -189,7 +189,7 @@ namespace RotationSolver.IPC
 
 			var internalName = Svc.PluginInterface.InternalName ?? "RotationSolver";
 			var displayName = Svc.PluginInterface.Manifest?.Name ?? "Rotation Solver";
-			var callbackName = $"{typeof(Wrath_IPCSubscriber).FullName}.LeaseCancelled";
+			const string callbackName = "RotationSolverReborn"; // Wrath appends .WrathComboCallback to this prefix.
 
 			_curLease = RegisterForLeaseWithCallback(internalName, displayName, callbackName);
 			return _curLease.HasValue;

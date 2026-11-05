@@ -1,3 +1,5 @@
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using RotationSolver.IPC;
 
 static void Check(bool value) { if (!value) throw new Exception("Setting conversion failed"); }
@@ -29,3 +31,17 @@ Check(ManualActionPolicy.Allowed(true, null, 1, 2));
 Check(ManualActionPolicy.Key(24, true) != ManualActionPolicy.Key(24, false));
 Check(ManualActionPolicy.Key(24, false) != ManualActionPolicy.Key(28, false));
 Console.WriteLine("Manual action permission checks passed.");
+
+var binary = Path.Combine("RotationSolver", "bin", "Release", "RotationSolver.dll");
+if (File.Exists(binary))
+{
+    using var stream = File.OpenRead(binary);
+    using var pe = new PEReader(stream);
+    var metadata = pe.GetMetadataReader();
+    var config = metadata.TypeDefinitions.Select(h => metadata.GetTypeDefinition(h))
+        .Single(t => metadata.GetString(t.Name) == "Configs");
+    var properties = config.GetProperties().Select(h => metadata.GetString(metadata.GetPropertyDefinition(h).Name)).ToHashSet();
+    foreach (var key in new[] { "TeachingMode", "ShowInfoOnDtr", "AutoBurst", "UseAbility", "UseDefenseAbility", "UseStDefense", "UseAoeDefense", "UseBmrTimeline", "UseDutyActions", "AutoTankStance", "UseGroundBeneficialAbility", "UseGroundBeneficialAbilityWhenMoving", "UseGroundBeneficialAbilityOnlySelf", "AutoHeal" })
+        if (!properties.Contains(key)) throw new Exception("Missing Accord-owned RSR setting: " + key);
+    Console.WriteLine("Built RSR settings surface verified.");
+}

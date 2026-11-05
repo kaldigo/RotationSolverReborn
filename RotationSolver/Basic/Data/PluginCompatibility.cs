@@ -62,6 +62,9 @@ public readonly struct IncompatiblePlugin
 	{
 		get
 		{
+            // The matching fork is intentionally loaded while Accord coordinates execution.
+            if (Name == "Wrath Combo" && RotationSolver.IPC.AutomationOwnership.Managed)
+                return false;
 			var name = Name;
 			var installedPlugins = Svc.PluginInterface.InstalledPlugins;
 			foreach (var x in installedPlugins)

@@ -453,11 +453,9 @@ internal partial class Configs : IPluginConfiguration, IM3Settings
 	Filter = UiInformation)]
 	private static readonly bool _changelogPopup = true;
 
-	[ConditionBool, UI("Show RSR's state in the server info bar",
-	Filter = UiInformation)]
-	private static readonly bool _showInfoOnDtr = true;
+	[ConditionBool]
+	private static readonly bool _showInfoOnDtr = false;
 
-	[UI("Server info bar style", Parent = nameof(ShowInfoOnDtr))]
 	public DTRType DTRType { get; set; } = DTRType.DTRNormal;
 
 	[ConditionBool, UI("Show a toast when RSR's state changes",
