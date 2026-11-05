@@ -111,7 +111,7 @@ namespace RotationSolver.Updaters
 
 		private static unsafe bool SetAutoAttackStateDetour(AutoAttackState* self, bool value, bool sendPacket, bool isInstant)
 		{
-			if (value && Player.Available && DataCenter.IsActivated() && PlayerHasNoCastingStatus())
+            if (RotationSolver.IPC.AutomationOwnership.Allowed && value && Player.Available && DataCenter.IsActivated() && PlayerHasNoCastingStatus())
 			{
 				PluginLog.Debug("[AutoAttackUpdater] Prevented auto attack activation due to NoCastingStatus.");
 				return true;

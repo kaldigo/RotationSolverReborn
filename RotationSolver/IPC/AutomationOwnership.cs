@@ -18,11 +18,22 @@ internal static class AutomationOwnership
         catch
         {
             Lease.Stop();
-            DataCenter.State = false;
-            DataCenter.ClearAccordPendingActions();
-            ActionUpdater.ClearNextAction();
+            StopExecution();
             return null;
         }
+    }
+
+    internal static void StopExecution()
+    {
+        // The normal updater cannot release its movement lock after an early
+        // ownership return. Use RSR's ordinary Off transition once, then keep
+        // transient suggestions/requests empty while the gate remains closed.
+        if (DataCenter.State || DataCenter.IsManual || DataCenter.IsTargetOnly ||
+            DataCenter.IsAutoDuty || DataCenter.IsHenched || DataCenter.IsPvPStateEnabled)
+            RotationSolver.Commands.RSCommands.UpdateState(StateCommandType.Off, DataCenter.Role);
+        Service.CanMove = true;
+        DataCenter.ClearAccordPendingActions();
+        ActionUpdater.ClearNextAction();
     }
 
     internal static IDisposable IsolateWrathHooks()

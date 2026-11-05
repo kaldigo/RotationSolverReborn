@@ -42,7 +42,11 @@ internal static class MajorUpdater
 	private static void OnUpdate(IFramework framework)
 	{
 		// Includes auto-enable, targeting, movement, macros and cast cancellation paths.
-		if (!AutomationOwnership.Allowed) return;
+        if (!AutomationOwnership.Allowed)
+        {
+            AutomationOwnership.StopExecution();
+            return;
+        }
 		using var independentActions = AutomationOwnership.TryIsolateWrathHooks();
 		if (independentActions == null) return;
 		if (!ShouldRunThisCycle(framework, out var isValid))
