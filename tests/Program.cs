@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using RotationSolver.IPC;
@@ -45,3 +46,20 @@ if (File.Exists(binary))
         if (!properties.Contains(key)) throw new Exception("Missing Accord-owned RSR setting: " + key);
     Console.WriteLine("Built RSR settings surface verified.");
 }
+
+var initial = Newtonsoft.Json.Linq.JObject.Parse(AccordSettings.Read())["Settings"]!;
+Check(initial["TeachingMode"]!.Value<bool>());
+Check(initial["ReadOnly"] == null && initial["Static"] == null && initial["Version"] == null);
+Check(Newtonsoft.Json.Linq.JObject.Parse(AccordSettings.Set("TeachingMode", "false")).Value<bool>("Success"));
+Check(!Service.Config.TeachingMode.Value);
+Check(!Newtonsoft.Json.Linq.JObject.Parse(AccordSettings.Read())["Settings"]!["TeachingMode"]!.Value<bool>());
+Check(Newtonsoft.Json.Linq.JObject.Parse(AccordSettings.Set("Ordinary", "true")).Value<bool>("Success"));
+Check(Service.Config.Ordinary);
+Check(!Newtonsoft.Json.Linq.JObject.Parse(AccordSettings.Set("ReadOnly", "true")).Value<bool>("Success"));
+Check(!Newtonsoft.Json.Linq.JObject.Parse(AccordSettings.Set("TeachingMode", "1")).Value<bool>("Success"));
+Service.Config.FailSave = true;
+Check(!Newtonsoft.Json.Linq.JObject.Parse(AccordSettings.Set("TeachingMode", "true")).Value<bool>("Success"));
+Check(!Service.Config.TeachingMode.Value);
+Check(!Newtonsoft.Json.Linq.JObject.Parse(AccordSettings.Set("Ordinary", "false")).Value<bool>("Success"));
+Check(Service.Config.Ordinary);
+Console.WriteLine("Production settings API: private-set wrapper read/write, validation and save rollback passed.");

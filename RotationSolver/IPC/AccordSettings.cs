@@ -7,8 +7,9 @@ namespace RotationSolver.IPC;
 internal static class AccordSettings
 {
     private static bool Supported(PropertyInfo p) => p.Name != "Version" && p.GetIndexParameters().Length == 0 &&
-        p.GetMethod?.IsPublic == true && !p.GetMethod.IsStatic && p.SetMethod?.IsPublic == true &&
-        (p.PropertyType == typeof(ConditionBoolean) || SettingsValue.Supported(p.PropertyType));
+        p.GetMethod?.IsPublic == true && !p.GetMethod.IsStatic &&
+        (p.PropertyType == typeof(ConditionBoolean) ||
+         p.SetMethod?.IsPublic == true && SettingsValue.Supported(p.PropertyType));
 
     internal static string Read()
     {
