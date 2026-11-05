@@ -37,9 +37,20 @@ internal static class AutomationOwnership
         ActionUpdater.ClearNextAction();
     }
 
+    internal static bool RequiresWrathIsolation
+    {
+        get
+        {
+            if (!Managed) return false;
+            foreach (var plugin in Svc.PluginInterface.InstalledPlugins)
+                if (plugin.InternalName == "WrathCombo" && plugin.IsLoaded) return true;
+            return false;
+        }
+    }
+
     internal static IDisposable IsolateWrathHooks()
     {
-        if (!Managed) return new Scope(false);
+        if (!RequiresWrathIsolation) return new Scope(false);
         if (externalDepth == 0 && !Svc.PluginInterface.GetIpcSubscriber<Guid, bool>("WrathCombo.AutomationExternal.Begin.v1").InvokeFunc(controller))
             throw new InvalidOperationException("Wrath did not confirm independent RSR action execution.");
         externalDepth++;

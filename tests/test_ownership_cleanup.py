@@ -23,6 +23,7 @@ class OwnershipCleanupTests(unittest.TestCase):
         cleanup = method('RotationSolver/IPC/AutomationOwnership.cs', 'internal static void StopExecution()')
         hook = method('RotationSolver/Updaters/AutoAttackUpdater.cs', 'private static unsafe bool SetAutoAttackStateDetour(')
         hook = hook.replace('private static unsafe', 'public static unsafe', 1)
+        isolation = method('RotationSolver/IPC/AutomationOwnership.cs', 'internal static bool RequiresWrathIsolation')
         harness = r'''
 using System;
 namespace AccordDiagnostics { static class DiagnosticLog { public static void Event(string kind, Func<object?> data) {} public static bool Reject(string reason) => false; } }
@@ -33,6 +34,9 @@ static class DataCenter {
     public static void ClearAccordPendingActions() { Pending = 0; Cleared++; }
 }
 static class Service { public static bool CanMove; }
+static class Svc { public static Interface PluginInterface = new(); }
+class Interface { public System.Collections.Generic.List<Plugin> InstalledPlugins = new(); }
+class Plugin { public string InternalName = ""; public bool IsLoaded; }
 static class ActionUpdater { public static int Next; public static void ClearNextAction() => Next = 0; }
 enum StateCommandType { Off }
 static class Player { public static bool Available = true; }
@@ -50,7 +54,8 @@ namespace RotationSolver.Commands {
 }
 namespace RotationSolver.IPC {
     static class AutomationOwnership {
-        public static bool Allowed;
+        public static bool Allowed, Managed;
+        ISOLATION
         CLEANUP
     }
 }
@@ -63,6 +68,15 @@ static unsafe class Hook {
     static bool PlayerHasNoCastingStatus() => true;
     HOOK
     public static void Main() {
+        RotationSolver.IPC.AutomationOwnership.Managed = true;
+        if (RotationSolver.IPC.AutomationOwnership.RequiresWrathIsolation) throw new Exception("Absent Wrath must not require its IPC");
+        var peer = new Plugin { InternalName = "WrathCombo", IsLoaded = true };
+        Svc.PluginInterface.InstalledPlugins.Add(peer);
+        if (!RotationSolver.IPC.AutomationOwnership.RequiresWrathIsolation) throw new Exception("Any loaded Wrath must require verified hook isolation");
+        peer.IsLoaded = false;
+        if (RotationSolver.IPC.AutomationOwnership.RequiresWrathIsolation) throw new Exception("Disabled Wrath must not require IPC");
+        peer.IsLoaded = true; RotationSolver.IPC.AutomationOwnership.Managed = false;
+        if (RotationSolver.IPC.AutomationOwnership.RequiresWrathIsolation) throw new Exception("Unmanaged upstream behavior must remain independent");
         foreach (var name in new[] { "State", "IsManual", "IsTargetOnly", "IsAutoDuty", "IsHenched", "IsPvPStateEnabled" }) {
             typeof(DataCenter).GetField(name)!.SetValue(null, true);
             Service.CanMove = false; DataCenter.Pending = 3; ActionUpdater.Next = 5;
@@ -80,7 +94,7 @@ static unsafe class Hook {
             throw new Exception("Active RSR lost its ordinary no-casting-status protection");
     }
 }
-'''.replace('CLEANUP', cleanup).replace('HOOK', hook)
+'''.replace('CLEANUP', cleanup).replace('HOOK', hook).replace('ISOLATION', isolation)
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
             (directory / 'Review.csproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><AllowUnsafeBlocks>true</AllowUnsafeBlocks></PropertyGroup></Project>')
