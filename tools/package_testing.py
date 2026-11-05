@@ -56,6 +56,7 @@ def main():
     cfg = json.loads((root / 'release-config.json').read_text())
     built = json.loads((root / cfg['build'] / (cfg['internal_name'] + '.json')).read_text(encoding='utf-8-sig'))
     built['DownloadLinkTesting'] = f"https://github.com/{cfg['repository']}/releases/download/{args.tag}/{cfg['internal_name']}.zip"
+    built['IconUrl'] = f"https://raw.githubusercontent.com/{cfg['repository']}/{args.tag}/assets/icon.png"
     combined = overlay(stable, built)
     package(root, args.tag, 'Opt-in testing build. Native acceptance remains pending.', testing=True)
     output = root / 'artifacts/testing'

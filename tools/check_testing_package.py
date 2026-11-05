@@ -33,6 +33,9 @@ def main():
         expected = f"https://github.com/{cfg['repository']}/releases/download/{args.tag}/{name}.zip"
         if any(manifest.get(key) != expected for key in ['DownloadLinkInstall', 'DownloadLinkUpdate', 'DownloadLinkTesting']):
             raise ValueError('Package links do not match immutable testing tag')
+    candidate = json.loads((output / 'testing-release.json').read_text())
+    if candidate.get('IconUrl') != manifest.get('IconUrl'):
+        raise ValueError('Testing listing icon differs from the packaged icon')
     stable = json.loads(args.stable_feed.read_text(encoding='utf-8-sig'))
     if json.loads((output / 'pluginmaster.json').read_text()) != overlay(stable, manifest):
         raise ValueError('Testing feed changed stable information')
