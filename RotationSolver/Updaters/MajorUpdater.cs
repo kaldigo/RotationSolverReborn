@@ -49,6 +49,7 @@ internal static class MajorUpdater
             AutomationOwnership.StopExecution();
             return;
         }
+		if (RotationInterop.ManualLimitBreak.Waiting()) { AccordDiagnostics.DiagnosticLog.Exit("Manual limit break in progress"); return; }
 		using var independentActions = AutomationOwnership.TryIsolateWrathHooks();
         if (independentActions == null) { AccordDiagnostics.DiagnosticLog.Exit("Wrath isolation unavailable"); return; }
 		if (!ShouldRunThisCycle(framework, out var isValid))

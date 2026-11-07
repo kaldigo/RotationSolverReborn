@@ -88,6 +88,7 @@ public sealed unsafe class ActionManagerEx : IDisposable
 
 	private bool UseActionLocationDetour(ActionManager* self, ActionType actionType, uint actionId, ulong targetId, Vector3* location, uint extraParam, byte comboRouteId)
 	{
+        RotationInterop.ManualLimitBreak.Placement(actionType, actionId);
 		var prevSequence = self->LastUsedActionSequence;
 		var result = _useActionLocationHook!.Original(self, actionType, actionId, targetId, location, extraParam, comboRouteId);
 

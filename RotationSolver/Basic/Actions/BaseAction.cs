@@ -268,7 +268,9 @@ public class BaseAction : IBaseAction
         using var diagnosticScope = AccordDiagnostics.DiagnosticLog.Begin("Native.Request", () => new { Action = ID, Target = Target.Target?.GameObjectId, Position = Target.Position });
 		if (!RotationSolver.IPC.AutomationOwnership.Allowed) return AccordDiagnostics.DiagnosticLog.Reject("RSR execution gate");
 		if (!RotationSolver.IPC.AccordActionPermissions.Allowed(ID, AdjustedID)) return AccordDiagnostics.DiagnosticLog.Reject("RSR execution gate");
-		using var independentAction = RotationSolver.IPC.AutomationOwnership.IsolateWrathHooks();
+		if (RotationInterop.ManualLimitBreak.Waiting()) return false;
+        using var queueScope = RotationInterop.ManualLimitBreak.TrackRunner();
+        using var independentAction = RotationSolver.IPC.AutomationOwnership.IsolateWrathHooks();
 		if (Player.Object == null)
 		{
 			return AccordDiagnostics.DiagnosticLog.Reject("RSR execution gate");

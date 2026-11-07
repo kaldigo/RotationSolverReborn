@@ -99,6 +99,8 @@ namespace RotationSolver.Updaters
 
 		private static unsafe bool UseActionDetour(ActionManager* actionManager, uint actionType, uint actionID, ulong targetObjectID, uint param, uint useType, int pvp, bool* isGroundTarget)
 		{
+			if (RotationInterop.ManualLimitBreak.Input(actionManager, (ActionType)actionType, actionID, useType == (uint)ActionManager.UseActionMode.Queue))
+                return _useActionHook!.Original(actionManager, actionType, actionID, targetObjectID, param, useType, pvp, isGroundTarget);
 			if (!RotationSolver.IPC.AutomationOwnership.Managed && Player.Available && Service.Config.InterceptAction3 && DataCenter.State && DataCenter.InCombat && !DataCenter.IsPvP)
 			{
 				try
