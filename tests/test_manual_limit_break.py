@@ -18,6 +18,13 @@ unsafe {
     void Check(bool ok, string reason) { if(!ok) throw new Exception(reason); }
     void Press() => ManualLimitBreak.Input(am, ActionType.GeneralAction, 3, false);
     void Queue(uint id, ulong target) { am->ActionQueued=true; am->QueuedActionType=ActionType.Action; am->QueuedActionId=id; am->QueuedTargetId.Id=target; }
+    var gcd = am->GetRecastGroupDetail(57);
+    gcd->IsActive=true; gcd->Total=2.5f; gcd->Elapsed=0;
+    Clock.TickCount64=1000; Press(); Clock.TickCount64+=2501;
+    Check(ManualLimitBreak.Waiting(),"runner resumed before LB got its post-GCD retry");
+    am->CastActionId=123; am->CastTimeTotal=5; am->CastTimeElapsed=1;
+    Check(ManualLimitBreak.InputDeadline(am,1000)==6800,"longer current cast was ignored");
+    am->CastActionId=0; gcd->IsActive=false;
     Clock.TickCount64=10000;
     using (ManualLimitBreak.TrackRunner()) Queue(34606,42);
     Press(); Check(!am->ActionQueued && ManualLimitBreak.Waiting(),"Viper queue beat manual LB");
@@ -52,9 +59,13 @@ namespace ECommons.DalamudServices {
 }
 namespace FFXIVClientStructs.FFXIV.Client.Game {
  enum ActionType { Action=1, GeneralAction=5 }
+ struct Recast { public bool IsActive; public float Total,Elapsed; }
  struct Target {public ulong Id;}
  unsafe struct ActionManager {
    static ActionManager* pointer=(ActionManager*)System.Runtime.InteropServices.NativeMemory.AllocZeroed((nuint)sizeof(ActionManager));
+   static Recast* gcd=(Recast*)System.Runtime.InteropServices.NativeMemory.AllocZeroed((nuint)sizeof(Recast));
+   public Recast* GetRecastGroupDetail(int group)=> group==57 ? gcd : null;
+   public float CastTimeTotal,CastTimeElapsed;
    public static ActionManager* Instance()=>pointer;
    public ActionType QueuedActionType,CastActionType,AreaTargetingActionType;
    public uint QueuedActionId,CastActionId,AreaTargetingActionId;
